@@ -1,4 +1,4 @@
-package UI;
+package ru.yandex.vasily.danilin.letterClassificationNetwork;
 
 
 import javafx.geometry.Point2D;
