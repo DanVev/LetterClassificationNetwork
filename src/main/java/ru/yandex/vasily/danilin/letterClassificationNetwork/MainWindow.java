@@ -31,12 +31,11 @@ public class MainWindow {
     private JLabel accuracyLabel;
     private JLabel letterLabel;
     private JButton saveButton;
-    private static MultiLayerPerceptron network = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 30*40, 30*40, 32);
-    private static DataSet dataSet = new DataSet(30*40,32);
+    private static MultiLayerPerceptron network = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 30 * 40, 30 * 40, 10);
+    private static DataSet dataSet = new DataSet(30 * 40, 10);
 
-    //private  static final String[] letters = {"А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "Й", "К", "Л" ,"М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", ""};
-    private static final char[] letters = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ".toCharArray();
-
+    //private  static final String[] numbers = {"А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "Й", "К", "Л" ,"М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", ""};
+    private static final String[] numbers = "0123456789".split("");
 
     private MainWindow() {
 
@@ -59,26 +58,28 @@ public class MainWindow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                network.learn(dataSet);
+                if (dataSet.size() != 0)
+                    network.learn(dataSet);
+                dataSet.clear();
             }
         });
         predictButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                DataSet testDataSet = new DataSet(30*40,32);
-                network.setInput(new Sample(((PaintingPanel)paintingPanel).getPoints(),300,400).getPoints());
+                DataSet testDataSet = new DataSet(30 * 40, 10);
+                network.setInput(new Sample(((PaintingPanel) paintingPanel).getPoints(), 300, 400).getPoints());
                 network.calculate();
                 double[] networkOutput = network.getOutput();
                 double sum = Arrays.stream(networkOutput).sum();
                 double max = Arrays.stream(networkOutput).max().getAsDouble();
                 int index = -1;
                 for (int i = 0; i < networkOutput.length; i++) {
-                    if ((networkOutput[i]-0.01 < max)&&(networkOutput[i]+0.01>max))
+                    if ((networkOutput[i] - 0.01 < max) && (networkOutput[i] + 0.01 > max))
                         index = i;
                 }
-                accuracyNumberLabel.setText(String.valueOf(new DecimalFormat("#.##").format(max/sum)));
-                letterLabel.setText(String.valueOf(letters[index]));
+                accuracyNumberLabel.setText(String.valueOf(new DecimalFormat("#.##").format(max / sum)));
+                letterLabel.setText(String.valueOf(numbers[index]));
 
             }
 
@@ -87,9 +88,9 @@ public class MainWindow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                double[] desiredOutput = new double[32];
+                double[] desiredOutput = new double[10];
                 desiredOutput[letterComboBox.getSelectedIndex()] = 1;
-                dataSet.addRow(new DataSetRow(new Sample(((PaintingPanel)paintingPanel).getPoints(),300,400).getPoints(),desiredOutput));
+                dataSet.addRow(new DataSetRow(new Sample(((PaintingPanel) paintingPanel).getPoints(), 300, 400).getPoints(), desiredOutput));
                 clearFieldsandPanels();
             }
         });
@@ -101,7 +102,9 @@ public class MainWindow {
         accuracyNumberLabel.setText("");
     }
 
+    @SuppressWarnings("unchecked")
     private void createUIComponents() {
+        letterComboBox = new JComboBox(new DefaultComboBoxModel<>(numbers));
         paintingPanel = new PaintingPanel();
         paintingPanel.setSize(300, 400);
         paintingPanel.setMinimumSize(new Dimension(300, 400));
@@ -119,8 +122,6 @@ public class MainWindow {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-
-
 
 
     }
