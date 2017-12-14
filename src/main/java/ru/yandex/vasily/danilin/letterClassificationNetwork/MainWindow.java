@@ -114,7 +114,7 @@ public class MainWindow {
 
     public static void main(String[] args) {
         Sample.setCompression(10);
-        JFrame frame = new JFrame("MainWindow");
+        JFrame frame = new JFrame("Letter Classification Network");
         System.out.println("create windows");
         frame.setSize(380, 400);
         frame.setResizable(false);
